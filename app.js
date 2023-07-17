@@ -40,7 +40,11 @@ app.use(mongoSanitize());
 app.use(xss());
 
 // Prevent parameter pollution
-app.use(hpp());
+app.use(
+  hpp({
+    whitelist: ["search", "role", "location", "contract"],
+  })
+);
 
 // ROUTES
 app.use("/api/v1/jobs", jobsRouter);
