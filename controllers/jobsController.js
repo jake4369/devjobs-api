@@ -22,3 +22,34 @@ exports.getAllJobs = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.getJob = catchAsync(async (req, res, next) => {
+  const job = await Jobs.findById(req.params.id);
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      job,
+    },
+  });
+});
+
+exports.createJob = catchAsync(async (req, res, next) => {
+  const newJob = await Jobs.create(req.body);
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      job: newJob,
+    },
+  });
+});
+
+exports.deleteJob = catchAsync(async (req, res, next) => {
+  await Jobs.findByIdAndDelete(req.params.id);
+
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
+});
