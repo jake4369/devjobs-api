@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
@@ -11,6 +12,8 @@ const jobsRouter = require("./routes/jobsRoutes");
 const userRouter = require("./routes/userRoutes");
 
 const app = express();
+
+app.use(cors());
 
 // GLOBAL
 // Set security HTTP headers
