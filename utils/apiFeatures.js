@@ -24,7 +24,15 @@ class APIFeatures {
         $or: [
           { company: new RegExp(word, "i") },
           { position: new RegExp(word, "i") },
-          // { description: new RegExp(word, "i") },
+          { description: new RegExp(word, "i") },
+          { "requirements.content": new RegExp(word, "i") },
+          { "role.content": new RegExp(word, "i") },
+          {
+            "requirements.items": {
+              $elemMatch: { $regex: new RegExp(word, "i") },
+            },
+          }, // Search within requirements.items array
+          { "role.items": { $elemMatch: { $regex: new RegExp(word, "i") } } }, // Search within role.items array
         ],
       }));
       this.query = this.query.find({
