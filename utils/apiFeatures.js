@@ -5,28 +5,68 @@ class APIFeatures {
   }
 
   filter() {
-    const queryObj = { ...this.queryString };
-    const excludedFields = ["page", "sort", "limit", "fields", "search"];
-    excludedFields.forEach((el) => delete queryObj[el]);
+    const { search, company, location, contract } = this.queryString;
+    let searchQuery = []; // Declare and initialize the searchQuery variable
 
-    // Perform case-insensitive search using a regular expression
-    Object.keys(queryObj).forEach((key) => {
-      queryObj[key] = { $regex: new RegExp(queryObj[key], "i") };
-    });
+    // Search by company and position
+    if (search) {
+      let searchWords = search.split(/[\s-]+/);
 
-    // Search for the specified keyword in all fields
-    const searchTerm = this.queryString.search;
-    if (searchTerm) {
-      const regex = new RegExp(searchTerm, "i");
-      const searchQuery = { $or: [] };
-      Object.keys(this.query.model.schema.paths).forEach((field) => {
-        if (field !== "__v" && field !== "_id") {
-          searchQuery["$or"].push({ [field]: regex });
-        }
+      if (search === "fullstack") {
+        searchWords = ["full", "stack"];
+      } else if (search === "frontend") {
+        searchWords = ["front", "end"];
+      } else if (search === "backend") {
+        searchWords = ["back", "end"];
+      }
+
+      searchQuery = searchWords.map((word) => ({
+        $or: [
+          { company: new RegExp(word, "i") },
+          { position: new RegExp(word, "i") },
+          // { description: new RegExp(word, "i") },
+        ],
+      }));
+      this.query = this.query.find({
+        $and: searchQuery, // Use the $and operator to match all words
       });
-      this.query.find({ $and: [queryObj, searchQuery] });
-    } else {
-      this.query.find(queryObj);
+    }
+
+    if (company) {
+      searchQuery = company
+        .toLowerCase()
+        .split(" ")
+        .map((word) => ({
+          $or: [{ company: new RegExp(word, "i") }],
+        }));
+      this.query = this.query.find({
+        $and: searchQuery,
+      });
+    }
+
+    // Search by location (case-insensitive)
+    if (location) {
+      searchQuery = location
+        .toLowerCase()
+        .split(" ")
+        .map((word) => ({
+          $or: [{ location: new RegExp(word, "i") }],
+        }));
+      this.query = this.query.find({
+        $and: searchQuery,
+      });
+    }
+
+    if (contract) {
+      searchQuery = contract
+        .toLowerCase()
+        .split(" ")
+        .map((word) => ({
+          $or: [{ contract: new RegExp(word, "i") }],
+        }));
+      this.query = this.query.find({
+        $and: searchQuery,
+      });
     }
 
     return this;
