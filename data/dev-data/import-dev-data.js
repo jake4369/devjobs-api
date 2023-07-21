@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const Jobs = require("../../models/jobsModel");
 
 require("dotenv").config({
-  path: "./config.env",
+  path: "./../../config.env",
 });
 
 const DB = process.env.DATABASE.replace(
